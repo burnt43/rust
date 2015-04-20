@@ -23,6 +23,7 @@ fn main() {
     println!("value: {}",value);
     println!("first: {}",first);
     println!("second: {}",second);
+    let z: fn(u8,u8) -> u8 = ret_sum;
 }
 
 fn print_thing(x: u8) {
