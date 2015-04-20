@@ -1,4 +1,5 @@
 fn main() {
+    //comments
     let foo = 27;
     let (x,y) = (1,2);
     let mut bar : u8 = 0;
@@ -30,6 +31,15 @@ fn print_thing(x: u8) {
     println!("x: {}",x);
 }
 
+/// Adds 2 Numbers
+///
+/// #Examples
+///
+/// ```
+/// let (x,y) = (1,2)
+///
+/// assert_eq!(3,print_sum(1,2));
+/// ```
 fn print_sum(x: u8,y: u8) {
     println!("sum: {}",x+y);
 }
