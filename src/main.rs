@@ -120,6 +120,44 @@ fn traits_test() {
     };
     multiple_traits(y,x);
 }
+//-----------------------------------------------------------------------------------------------
+//
+// if let
+//
+//-----------------------------------------------------------------------------------------------
+fn foobar0 (a: Option<u8>) {
+    if let Option::Some(x) = a {
+        println!("{}",x);
+    } else {
+        println!("not Option::Some()");
+    }
+}
+fn if_let_test () {
+    let foo: Option<u8> = Some(32);
+    let bar: Option<u8> = None;
+    foobar0(foo);
+    foobar0(bar);
+}
+//-----------------------------------------------------------------------------------------------
+//
+// while let
+//
+//-----------------------------------------------------------------------------------------------
+fn some_computation (a: u8) -> Result<u8,i8> {
+    if a > 10 {
+        Result::Err(-1)
+    } else {
+        Result::Ok(a*3)
+    }
+}
+fn while_let_test () {
+    let mut x = 0;
+    while let Result::Ok(y) = some_computation(x) {
+        println!("{}",y);
+        x = x+1;
+    }
+    println!("done!");
+}
 
 //-----------------------------------------------------------------------------------------------
 //
@@ -130,4 +168,6 @@ fn traits_test() {
 fn main () {
     generics_test();
     traits_test();
+    if_let_test();
+    while_let_test();
 }
