@@ -52,9 +52,17 @@ struct Dog {
 trait CanSpeak {
     fn speak(&self);
 }
+trait CanPurr {
+    fn purr(&self);
+}
 impl CanSpeak for Cat {
     fn speak(&self) {
         println!("meow! my name is {} and i'm {} years old",self.name,self.age);
+    }
+}
+impl CanPurr for Cat {
+    fn purr(&self) {
+        println!("prrrrrrrrrrrrrrrrrrr");
     }
 }
 impl CanSpeak for Dog {
@@ -68,6 +76,12 @@ fn make_animal_speak<T: CanSpeak>(animal: T) {
     animal.speak();
 }
 
+fn multiple_traits<A,B>(a: A, b: B) where A: CanSpeak, B: CanSpeak + CanPurr {
+    a.speak();
+    b.speak();
+    b.purr();
+}
+
 fn traits_test() {
     println!("------------------------------------------------------------");
     let cat = Cat{name: "Vixen", age: 13};
@@ -76,6 +90,15 @@ fn traits_test() {
     dog.speak();
     make_animal_speak(cat);
     make_animal_speak(dog);
+    let x = Cat{
+        name: "Steve",
+        age:  30
+    };
+    let y = Dog{
+        name: "Roger",
+        age:  25
+    };
+    multiple_traits(y,x);
 }
 
 //-----------------------------------------------------------------------------------------------
