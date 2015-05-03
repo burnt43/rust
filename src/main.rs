@@ -63,12 +63,19 @@ impl CanSpeak for Dog {
     }
 }
 
+fn make_animal_speak<T: CanSpeak>(animal: T) {
+    print!("making animal speak: ");
+    animal.speak();
+}
+
 fn traits_test() {
     println!("------------------------------------------------------------");
     let cat = Cat{name: "Vixen", age: 13};
     let dog = Dog{name: "Desmond", age: 3};
     cat.speak();
     dog.speak();
+    make_animal_speak(cat);
+    make_animal_speak(dog);
 }
 
 //-----------------------------------------------------------------------------------------------
