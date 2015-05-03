@@ -51,6 +51,9 @@ struct Dog {
 }
 trait CanSpeak {
     fn speak(&self);
+    fn id_self(&self) {
+        println!("I am a thing!");
+    }
 }
 trait CanPurr {
     fn purr(&self);
@@ -87,6 +90,7 @@ fn traits_test() {
     let cat = Cat{name: "Vixen", age: 13};
     let dog = Dog{name: "Desmond", age: 3};
     cat.speak();
+    cat.id_self();
     dog.speak();
     make_animal_speak(cat);
     make_animal_speak(dog);
