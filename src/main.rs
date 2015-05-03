@@ -58,9 +58,25 @@ trait CanSpeak {
 trait CanPurr {
     fn purr(&self);
 }
+trait Killer {
+    fn kill(&self);
+}
+trait Assassin : Killer {
+    fn assassinate(&self);
+}
 impl CanSpeak for Cat {
     fn speak(&self) {
         println!("meow! my name is {} and i'm {} years old",self.name,self.age);
+    }
+}
+impl Killer for Cat {
+    fn kill(&self) {
+        println!("death by scratches!");
+    }
+}
+impl Assassin for Cat {
+    fn assassinate(&self) {
+        println!("i'm an assassin! meow!");
     }
 }
 impl CanPurr for Cat {
