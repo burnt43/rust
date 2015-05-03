@@ -146,10 +146,42 @@ fn while_let_test () {
     println!("done!");
 }
 
+// threads ---------------------------------------------------------------------------------
+
+use std::thread;
+use std::sync::{Arc,Mutex};
+
+fn spawn_one_boring_thread () {
+    let t = thread::spawn(|| {
+        println!("i'm in a thread");
+    });
+    t.join();
+}
+
+fn shared_and_mutable () {
+    let data = Arc::new(Mutex::new(vec![10u8,20,30]));
+    for i in 0..3 {
+        let data = data.clone();
+        thread::spawn(move || {
+            let mut data = data.lock().unwrap();
+            println!("1. data[{}] = {}",i,data[i]);
+            data[i] += 1;
+            println!("2. data[{}] = {}",i,data[i]);
+        });
+    }
+    thread::sleep_ms(50);
+}
+
+fn thread_test () {
+    spawn_one_boring_thread();
+    shared_and_mutable();
+}
+
 // main  -----------------------------------------------------------------------------------
 fn main () {
     generics_test();
     traits_test();
     if_let_test();
     while_let_test();
+    thread_test();
 }
