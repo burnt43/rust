@@ -171,10 +171,28 @@ fn shared_and_mutable () {
     }
     thread::sleep_ms(50);
 }
+//34462
+struct Thing {
+    x: u16,
+}
+
+fn multi_threads () {
+    let mut foo = Thing { x: 0 };
+    for _ in 0..10 {
+        let thread = thread::spawn(move || {
+            while foo.x < 1000 {
+                println!("count: {}",foo.x);
+                foo.x+=1;
+            }
+        });
+        thread.join();
+    }
+}
 
 fn thread_test () {
     spawn_one_boring_thread();
     shared_and_mutable();
+    multi_threads();
 }
 
 // main  -----------------------------------------------------------------------------------
