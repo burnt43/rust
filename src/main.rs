@@ -191,10 +191,24 @@ fn multi_threads () {
     }
 }
 
+fn multi_threads_read_only () {
+    let foo = Arc::new(Thing {x:0});
+    for _ in 0..10 {
+        let foo = foo.clone();
+        let thread = thread::spawn(move || {
+            for _ in 0..1000 {
+                println!("x: {}",foo.x);
+            }
+        });
+        thread.join();
+    }
+}
+
 fn thread_test () {
     spawn_one_boring_thread();
     shared_and_mutable();
     multi_threads();
+    multi_threads_read_only();
 }
 
 // main  -----------------------------------------------------------------------------------
