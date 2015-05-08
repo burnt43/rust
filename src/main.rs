@@ -210,6 +210,52 @@ fn thread_test () {
     multi_threads();
     multi_threads_read_only();
 }
+// patterns  ------------------------------------------------------------------------------
+
+fn basic_pattern (x: u8) {
+    match x {
+        0 => println!("You gave me 0"),
+        1 => println!("You gave me 1"),
+        _ => println!("Not 0 or 1"),
+    }
+}
+
+fn basic_pattern2 (x: u8) {
+    match x {
+        0 | 1 => println!("You gave me 0 or 1"),
+        _     => println!("You have me something else"),
+    }
+}
+
+fn basic_pattern3 (x: u8) {
+    match x {
+        0...10  => println!("1-10"),
+        10...20 => println!("10-20"),
+        _       => println!("20-255"),
+    }
+}
+
+fn basic_pattern4 (x: u8) {
+    match x {
+        x @ 0...10 => println!("x: {}",x),
+        _          => println!("foobar"),
+    }
+}
+
+fn pattern_test () {
+    basic_pattern(0);
+    basic_pattern(1);
+    basic_pattern(56);
+    basic_pattern2(0);
+    basic_pattern2(1);
+    basic_pattern2(35);
+    basic_pattern3(5);
+    basic_pattern3(45);
+    basic_pattern3(17);
+    basic_pattern4(3);
+    basic_pattern4(128);
+}
+
 
 // main  -----------------------------------------------------------------------------------
 fn main () {
@@ -218,4 +264,5 @@ fn main () {
     if_let_test();
     while_let_test();
     thread_test();
+    pattern_test();
 }
