@@ -242,6 +242,42 @@ fn basic_pattern4 (x: u8) {
     }
 }
 
+fn basic_pattern5 () {
+    struct Person {
+        name: Option<String>,
+    }
+    let x = Person{name: Some("James".to_string())};
+    match x {
+        Person{name: Some(a)} => println!("{:?}",a),
+        _ => println!("BAR"),
+    }
+}
+
+fn basic_pattern6 () {
+    enum OptionalInt {
+        Value(i32),
+        Missing,
+    }
+    let x = OptionalInt::Value(128);
+    match x {
+        OptionalInt::Value(..) => println!("Value"),
+        OptionalInt::Missing   => println!("Missing"),
+    }
+}
+
+fn basic_pattern7 () {
+    enum OptionalInt {
+        Value(i32),
+        Missing,
+    }
+    let x = OptionalInt::Value(45);
+    match x {
+        OptionalInt::Value(i) if i > 20 => println!("{} > 20!",i),
+        OptionalInt::Value(..)          => println!("other"),
+        OptionalInt::Missing            => println!("missing"),
+    }
+}
+
 fn pattern_test () {
     basic_pattern(0);
     basic_pattern(1);
@@ -254,6 +290,9 @@ fn pattern_test () {
     basic_pattern3(17);
     basic_pattern4(3);
     basic_pattern4(128);
+    basic_pattern5();
+    basic_pattern6();
+    basic_pattern7();
 }
 
 
