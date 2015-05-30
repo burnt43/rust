@@ -367,6 +367,36 @@ fn closures_test() {
         some_closure(1)
     }
     assert_eq!(5,call_with_one(&|x| x + 4));
+    //
+    fn factory() -> Box<Fn(u8) -> u8> {
+        let num = 5;
+        Box::new(move |x| x + num)
+    }
+    let f = factory();
+    assert_eq!(9,f(4));
+}
+
+fn universal_function_call() {
+    trait Foo {
+        fn f(&self);
+    }
+    trait Bar {
+        fn f(&self);
+    }
+    struct Baz;
+    impl Foo for Baz {
+        fn f(&self) {
+            println!("FOO");
+        }
+    }
+    impl Bar for Baz {
+        fn f(&self) {
+            println!("BAR");
+        }
+    }
+    let thing = Baz;
+    Foo::f(&thing);
+    Bar::f(&thing);
 }
 
 // main  -----------------------------------------------------------------------------------
@@ -379,4 +409,5 @@ fn main () {
     pattern_test();
     trait_objects_test();
     closures_test();
+    universal_function_call();
 }
