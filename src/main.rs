@@ -1,7 +1,4 @@
 // Testing Generics ------------------------------------------------------------------------
-struct Person<T> {
-    id: T,
-}
 fn only_even_add(a: i8, b: i8) -> Result<i8,String> {
     if a % 2 == 0 && b % 2 == 0 {
         Result::Ok(a+b)
@@ -17,6 +14,9 @@ fn a_generic_function<T>(foo: T) {
 }
 
 fn generics_test() {
+    struct Person<T> {
+        id: T,
+    }
     println!("------------------------------------------------------------");
     let x: Option<i8> = Some(2);
     match x {
@@ -172,17 +172,17 @@ fn shared_and_mutable () {
     thread::sleep_ms(50);
 }
 
-struct Thing {
-    x: u16,
-}
 
 fn multi_threads () {
+    struct Thing {
+        x: u16,
+    }
     let foo = Arc::new(Mutex::new(Thing {x:0}));
     for _ in 0..10 {
         let foo = foo.clone();
         let thread = thread::spawn(move || {
             let mut foo = foo.lock().unwrap();
-            while foo.x < 1000 {
+            while foo.x < 10 {
                 println!("count: {}",foo.x);
                 foo.x+=1;
             }
@@ -192,11 +192,14 @@ fn multi_threads () {
 }
 
 fn multi_threads_read_only () {
+    struct Thing {
+        x: u16,
+    }
     let foo = Arc::new(Thing {x:0});
     for _ in 0..10 {
         let foo = foo.clone();
         let thread = thread::spawn(move || {
-            for _ in 0..1000 {
+            for _ in 0..10 {
                 println!("x: {}",foo.x);
             }
         });
@@ -294,7 +297,30 @@ fn pattern_test () {
     basic_pattern6();
     basic_pattern7();
 }
-
+// Trait Objects  -----------------------------------------------------------------------------------
+fn trait_objects_test() {
+    trait Foo {
+        fn method(&self) -> String;
+    }
+    impl Foo for u8 {
+        fn method(&self) -> String { format!("u8: {}",*self) }
+    }
+    impl Foo for String {
+        fn method(&self) -> String { format!("string: {}",*self) }
+    }
+    fn do_something<T: Foo> (x: T) {
+        x.method();
+    }
+    fn do_something2(x: &Foo) {
+        x.method();
+    }
+    let x = 5u8;
+    let y = "Hello".to_string();
+    do_something(x);
+    do_something(y);
+    do_something2(&x as &Foo);
+    do_something2(&x);
+}
 
 // main  -----------------------------------------------------------------------------------
 fn main () {
@@ -304,4 +330,5 @@ fn main () {
     while_let_test();
     thread_test();
     pattern_test();
+    trait_objects_test();
 }
