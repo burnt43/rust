@@ -321,6 +321,53 @@ fn trait_objects_test() {
     do_something2(&x as &Foo);
     do_something2(&x);
 }
+// closures  -----------------------------------------------------------------------------------
+fn closures_test() {
+    //
+    let plus_one = |x: u8| x + 1;
+    let plus_two = |x: u8| {
+        let mut result:u8 = x;
+        result+=1;
+        result+=1;
+        result
+    };
+    assert_eq!(2,plus_one(1));
+    assert_eq!(4,plus_two(2));
+    //
+    let mut num = 5;
+    let clos = |x: u8| x + num;
+    assert_eq!(8,clos(3));
+    //
+    let mut foo = 6;
+    {
+        let clos2 = |x: u8| x + foo;
+    }
+    let y = &mut foo;
+    //
+    let mut baz = 5;
+    {
+        let mut add_num = |x: u8| baz+=x;
+        add_num(2);
+    }
+    assert_eq!(baz,7);
+    //
+    let mut shiz = 10;
+    {
+        let mut add_num = move |x: u8| shiz+=x;
+        add_num(7);
+    }
+    assert_eq!(shiz,10);
+    //
+    fn call_with_two<F>(some_closure: F) -> i32 where F : Fn(i32) -> i32 {
+        some_closure(2)
+    }
+    assert_eq!(64,call_with_two(|x| x * 32));
+    //
+    fn call_with_one(some_closure: &Fn(i32) -> i32) -> i32 {
+        some_closure(1)
+    }
+    assert_eq!(5,call_with_one(&|x| x + 4));
+}
 
 // main  -----------------------------------------------------------------------------------
 fn main () {
@@ -331,4 +378,5 @@ fn main () {
     thread_test();
     pattern_test();
     trait_objects_test();
+    closures_test();
 }
