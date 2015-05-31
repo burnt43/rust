@@ -449,6 +449,30 @@ fn associated_types() {
     let obj = Box::new(graph) as Box<Graph<N=Node,E=Edge>>;
 }
 
+fn overloading() {
+    use std::ops::Add;
+    struct Num {
+        val: u8,
+    }
+    impl Add for Num {
+        type Output = Num;
+        fn add(self, other: Num) -> Num {
+            Num{val: self.val * other.val}
+        }
+    }
+    impl Add<u8> for Num {
+        type Output = u8;
+        fn add(self, other: u8) -> u8 {
+            self.val * other
+        }
+    }
+    let x = Num{val: 2};
+    let y = Num{val: 4};
+    let z = Num{val: 10};
+    assert_eq!(8,(x+y).val);
+    assert_eq!(20,z+2);
+}
+
 // main  -----------------------------------------------------------------------------------
 fn main () {
     generics_test();
@@ -464,4 +488,5 @@ fn main () {
     aliases();
     casting();
     associated_types();
+    overloading();
 }
