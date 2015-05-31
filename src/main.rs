@@ -399,6 +399,56 @@ fn universal_function_call() {
     Bar::f(&thing);
 }
 
+static N: u8 = 8;
+const MAX_THINGS: u8 = 68;
+
+fn static_and_const() {
+    println!("N: {}",N);
+    println!("MAX_THINGS: {}",MAX_THINGS);
+}
+
+fn aliases() {
+    type Name     = String;
+    let x: Name   = "Jim".to_string();
+    let y: String = "Gym".to_string();
+    println!("My name is {}",x);
+    if x == y {
+        println!("foobar");
+    }
+}
+
+fn casting() {
+    let x: u8 = 8;
+    let y = x as u16;
+    println!("x: {}",x);
+    println!("y: {}",y);
+}
+
+fn associated_types() {
+    trait Graph {
+        type N;
+        type E;
+        fn has_edge(&self,&Self::N,&Self::N) -> bool;
+        fn edges(&self, &Self::N) -> Vec<Self::E>;
+    }
+    struct Node;
+    struct Edge;
+    struct MyGraph;
+    impl Graph for MyGraph {
+        type N = Node;
+        type E = Edge;
+
+        fn has_edge(&self,n1: &Node,n2: &Node) -> bool {
+            true
+        }
+        fn edges(&self,n: &Node) -> Vec<Edge> {
+            Vec::new()
+        }
+    }
+    let graph = MyGraph;
+    let obj = Box::new(graph) as Box<Graph<N=Node,E=Edge>>;
+}
+
 // main  -----------------------------------------------------------------------------------
 fn main () {
     generics_test();
@@ -410,4 +460,8 @@ fn main () {
     trait_objects_test();
     closures_test();
     universal_function_call();
+    static_and_const();
+    aliases();
+    casting();
+    associated_types();
 }
