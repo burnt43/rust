@@ -1,492 +1,489 @@
-// Testing Generics ------------------------------------------------------------------------
-fn only_even_add(a: i8, b: i8) -> Result<i8,String> {
-    if a % 2 == 0 && b % 2 == 0 {
-        Result::Ok(a+b)
-    } else {
-        Result::Err("I can only add 2 even numbers!".to_string())
+extern crate time;
+use std::collections::HashMap;
+use std::fmt;
+use std::cmp::Ordering;
+use time::{Duration, PreciseTime, SteadyTime, Timespec};
+
+fn test_number_0 () {
+    assert!(true);
+    assert_eq!(10,5+5);
+    assert!( cfg!(target_os = "linux") );
+    println!("column!() = {}",column!());
+    assert_eq!("s1s2s3",concat!("s1","s2","s3"));
+    for path in env!("PATH").split(":") {
+        println!("{}",path);
+    }
+    assert_eq!("src/main.rs",file!());
+    assert_eq!("x: 10,y: 20",format!("x: {},y: {}",10,20));
+    let s = std::fmt::format( format_args!("{}",5) );
+    assert_eq!(s,"5");
+    let x:u8 = include!("./some_file");
+    assert_eq!(x,27);
+    let x:&[u8] = include_bytes!("./some.bin");
+    assert_eq!(65,x[0]);
+    let x:&str = include_str!("./some.txt");
+    for line in x.lines() {
+        println!("{}",line);
+    }
+    println!("line!(): {}",line!());
+    println!("module_path!(): {}",module_path!());
+    assert_eq!(None,option_env!("FOOBAR"));
+    assert_eq!("1 + 1",stringify!(1 + 1));
+
+    /*fn unfinished() {
+        unimplemented!();
+    }*/
+
+    fn some_computation () -> Result<u8, std::str::Utf8Error> {
+        let _ = try!( std::str::from_utf8(&[255,255]) );
+        Ok(40)
+    }
+
+    println!("{}",some_computation().unwrap_or(22));
+
+    match Option::Some(25) {
+        Some(n) if n >= 0 => println!(">= 0"),
+        Some(n) if n <  0 => println!("<  0"),
+        Some(_)           => unreachable!(),
+        None              => println!("none"),
+    }
+
+    enum List<T> {
+        Some(T,Box<List<T>>),
+        None,
+    }
+
+    let mut x:List<u8> = List::Some(1, Box::new(List::Some(2, Box::new(List::None))) );
+
+    loop {
+        match x {
+            List::Some(value,next) => { 
+                print!("{}->",value);
+                x = *next;
+            },
+            List::None => {
+                print!("EOL");
+                break
+            },
+        }
+    }
+    println!("");
+    
+    #[derive(PartialEq, Eq, Hash)]
+    enum MessageField {
+        Name,
+        Job,
+    }
+
+    fn convert_field_name_to_enum ( s:&str ) -> Option<MessageField> {
+        match &*s.to_lowercase() {
+            "name" => Some(MessageField::Name),
+            "job"  => Some(MessageField::Job),
+            _      => None,
+        }
+    }
+
+    let mut hash:HashMap<MessageField,&str> = HashMap::new();
+
+    let x = "Name: james carson\nJob: engineer";
+    for line in x.lines() {
+        let v:Vec<&str> = line.splitn(2,": ").collect();
+        let (message_field_name,data) = ( v[0], v[1] );
+        match convert_field_name_to_enum( message_field_name ) {
+            Some(message_field) => {
+                hash.insert(message_field,data);
+                ()
+            },
+            None => {},
+        }
+    }
+    println!("Name = {}",hash.get(&MessageField::Name).unwrap());
+    println!("Job  = {}",hash.get(&MessageField::Job).unwrap());
+
+    let s:&str = "hello my name is jim";
+    let mut iter = s.split(" ").map(|c:&str| c.len());
+    assert_eq!(iter.next().unwrap(),5);
+    assert_eq!(iter.next().unwrap(),2);
+    assert_eq!(iter.last().unwrap(),3);
+    let s:&str = "hello my name is jim";
+    let mut iter = s.split(" ").map(|c:&str| c.len());
+    assert_eq!(iter.nth(2).unwrap(),4);
+    assert_eq!(iter.next().unwrap(),2);
+    assert_eq!(iter.next().unwrap(),3);
+    assert!(iter.next().is_none());
+    let a = vec![1,2,3,4,5];
+    let b = vec![6,7,8,9,10];
+    for i in a.iter().chain(b.iter()) {
+        println!("i: {}",i);
+    }
+
+    for (i,j) in a.iter().zip(b.iter()) {
+        println!("i: {},j: {}",i,j);
+    }
+
+    for i in (0..10).filter(|c| c % 2 == 0) {
+        println!("{}",i);
+    }
+
+    for i in (0..10).filter_map(|c| {
+        if c % 2 == 0 {
+            Some(c * 5)
+        } else {
+            None
+        }
+    }) {
+        println!("{}",i);
+    }
+
+    for (index,el) in (1..10).enumerate() {
+        println!("index: {}, el: {}",index,el);
+    }
+
+    let mut iter = (0..3).peekable();
+    assert_eq!(iter.next().unwrap(),0);
+    assert_eq!(*iter.peek().unwrap(),1);
+
+    let s:&str = "THIS IS A STRING SLICE";
+    let mut iter = s.split(" ").peekable();
+
+    loop {
+        match iter.next() {
+            Some(x) => {
+                match iter.peek() {
+                    Some(_) => println!("Val: {}",x),
+                    None => {
+                        println!("Last Val: {}",x);
+                        break
+                    },
+                }
+            },
+            None => break,
+        }
     }
 }
 
-fn a_generic_function<T>(foo: T) {
+fn test_number_1 () {
+    struct Parser {
+        buffer: String,
+    }
+
+    enum MessageType {
+        Attack,
+        Defend,
+    }
+
+    struct Message {
+        message_type: MessageType,
+    }
+
+    impl Message {
+        fn create_from_str( s: &str ) -> Message {
+            Message{ message_type: MessageType::Attack }
+        }
+    }
+
+    impl Parser {
+        fn new() -> Parser {
+            Parser { buffer: String::new() }
+        }
+        fn push_to_buffer ( &mut self, s: &str ) -> Vec<Message> {
+            let mut messages: Vec<Message> = Vec::new();
+            let mut temp: String = self.buffer.clone();
+            temp.push_str(s);
+            let mut v: Vec<&str> = temp.split("\r\n\r\n").collect();
+            if v.len() > 1 {
+                let remainder: &str = v.pop().unwrap();
+                for x in v {
+                    println!("creating from {}",x);
+                    messages.push( Message::create_from_str(x) );
+                }
+                self.buffer = remainder.to_string();
+                println!("self.buffer: {}",self.buffer);
+            }
+            messages
+        }
+    }
+
+    let mut parser = Parser::new();
+    let some_data  = "Attack\r\nfoo\r\nbar\r\n\r\nDefend";
+    let _          = parser.push_to_buffer( some_data );
+    let _          = parser.push_to_buffer( "\nA\nB\nC\r\n\r\n" );
+
+    let foo: Option<&str> = Some("James");
     match foo {
-        _ => println!("test"),
+        Some("Jame") => println!("1"),
+        _ => println!("2"),
     }
 }
 
-fn generics_test() {
-    struct Person<T> {
-        id: T,
-    }
-    println!("------------------------------------------------------------");
-    let x: Option<i8> = Some(2);
-    match x {
-        Option::Some(i) => println!("{}",i),
-        Option::None    => println!("nothing"),
-    }
-    match only_even_add(1,2) {
-        Result::Ok(i)  => println!("result: {}",i),
-        Result::Err(e) => println!("operation failed: '{}'",e),
-    }
-    a_generic_function("jcarson");
-    a_generic_function(6);
-    a_generic_function(Person{id: 6});
-    a_generic_function(Person{id: "james"});
-}
-
-// Testing Traits ---------------------------------------------------------------------------------
-struct Cat {
-    name: &'static str,
-    age:  i8,
-}
-struct Dog {
-    name: &'static str,
-    age:  i8
-}
-trait CanSpeak {
-    fn speak(&self);
-    fn id_self(&self) {
-        println!("I am a thing!");
-    }
-}
-trait CanPurr {
-    fn purr(&self);
-}
-trait Killer {
-    fn kill(&self);
-}
-trait Assassin : Killer {
-    fn assassinate(&self);
-}
-impl CanSpeak for Cat {
-    fn speak(&self) {
-        println!("meow! my name is {} and i'm {} years old",self.name,self.age);
-    }
-}
-impl Killer for Cat {
-    fn kill(&self) {
-        println!("death by scratches!");
-    }
-}
-impl Assassin for Cat {
-    fn assassinate(&self) {
-        println!("i'm an assassin! meow!");
-    }
-}
-impl CanPurr for Cat {
-    fn purr(&self) {
-        println!("prrrrrrrrrrrrrrrrrrr");
-    }
-}
-impl CanSpeak for Dog {
-    fn speak(&self) {
-        println!("woof! my name is {} and i'm {} years old",self.name,self.age);
-    }
-}
-
-fn make_animal_speak<T: CanSpeak>(animal: T) {
-    print!("making animal speak: ");
-    animal.speak();
-}
-
-fn multiple_traits<A,B>(a: A, b: B) where A: CanSpeak, B: CanSpeak + CanPurr {
-    a.speak();
-    b.speak();
-    b.purr();
-}
-
-fn traits_test() {
-    println!("------------------------------------------------------------");
-    let cat = Cat{name: "Vixen", age: 13};
-    let dog = Dog{name: "Desmond", age: 3};
-    cat.speak();
-    cat.id_self();
-    dog.speak();
-    make_animal_speak(cat);
-    make_animal_speak(dog);
-    let x = Cat{
-        name: "Steve",
-        age:  30
-    };
-    let y = Dog{
-        name: "Roger",
-        age:  25
-    };
-    multiple_traits(y,x);
-}
-
-// if let --------------------------------------------------------------------------------------
-fn foobar0 (a: Option<u8>) {
-    if let Option::Some(x) = a {
-        println!("{}",x);
-    } else {
-        println!("not Option::Some()");
-    }
-}
-fn if_let_test () {
-    let foo: Option<u8> = Some(32);
-    let bar: Option<u8> = None;
-    foobar0(foo);
-    foobar0(bar);
-}
-
-// while let -----------------------------------------------------------------------------------
-fn some_computation (a: u8) -> Result<u8,i8> {
-    if a > 10 {
-        Result::Err(-1)
-    } else {
-        Result::Ok(a*3)
-    }
-}
-fn while_let_test () {
-    let mut x = 0;
-    while let Result::Ok(y) = some_computation(x) {
-        println!("{}",y);
-        x = x+1;
-    }
-    println!("done!");
-}
-
-// threads ---------------------------------------------------------------------------------
-
-use std::thread;
-use std::sync::{Arc,Mutex};
-
-fn spawn_one_boring_thread () {
-    let t = thread::spawn(|| {
-        println!("i'm in a thread");
-    });
-    t.join();
-}
-
-fn shared_and_mutable () {
-    let data = Arc::new(Mutex::new(vec![10u8,20,30]));
-    for i in 0..3 {
-        let data = data.clone();
-        thread::spawn(move || {
-            let mut data = data.lock().unwrap();
-            println!("1. data[{}] = {}",i,data[i]);
-            data[i] += 1;
-            println!("2. data[{}] = {}",i,data[i]);
-        });
-    }
-    thread::sleep_ms(50);
-}
-
-
-fn multi_threads () {
-    struct Thing {
-        x: u16,
-    }
-    let foo = Arc::new(Mutex::new(Thing {x:0}));
-    for _ in 0..10 {
-        let foo = foo.clone();
-        let thread = thread::spawn(move || {
-            let mut foo = foo.lock().unwrap();
-            while foo.x < 10 {
-                println!("count: {}",foo.x);
-                foo.x+=1;
-            }
-        });
-        thread.join();
-    }
-}
-
-fn multi_threads_read_only () {
-    struct Thing {
-        x: u16,
-    }
-    let foo = Arc::new(Thing {x:0});
-    for _ in 0..10 {
-        let foo = foo.clone();
-        let thread = thread::spawn(move || {
-            for _ in 0..10 {
-                println!("x: {}",foo.x);
-            }
-        });
-        thread.join();
-    }
-}
-
-fn thread_test () {
-    spawn_one_boring_thread();
-    shared_and_mutable();
-    multi_threads();
-    multi_threads_read_only();
-}
-// patterns  ------------------------------------------------------------------------------
-
-fn basic_pattern (x: u8) {
-    match x {
-        0 => println!("You gave me 0"),
-        1 => println!("You gave me 1"),
-        _ => println!("Not 0 or 1"),
-    }
-}
-
-fn basic_pattern2 (x: u8) {
-    match x {
-        0 | 1 => println!("You gave me 0 or 1"),
-        _     => println!("You have me something else"),
-    }
-}
-
-fn basic_pattern3 (x: u8) {
-    match x {
-        0...10  => println!("1-10"),
-        10...20 => println!("10-20"),
-        _       => println!("20-255"),
-    }
-}
-
-fn basic_pattern4 (x: u8) {
-    match x {
-        x @ 0...10 => println!("x: {}",x),
-        _          => println!("foobar"),
-    }
-}
-
-fn basic_pattern5 () {
+fn test_number_2 () {
+    #[derive(Debug)]
     struct Person {
-        name: Option<String>,
+        foo: Option<u8>,
+        bar: Option<u8>,
+        baz: Option<String>,
     }
-    let x = Person{name: Some("James".to_string())};
-    match x {
-        Person{name: Some(a)} => println!("{:?}",a),
-        _ => println!("BAR"),
+
+    impl Person {
+        fn to_u8_option( s: &str ) -> Option<u8> {
+            match s.parse::<u8>() {
+                Ok(value) => Option::Some(value),
+                Err(_)    => Option::None,
+            }
+        }
+        fn create_from_str(s: &str) -> Person {
+            let v: Vec<&str> = s.split(",").collect();
+            Person {
+                foo: Person::to_u8_option( v[0] ),
+                bar: Person::to_u8_option( v[1] ),
+                baz: Option::Some("James".to_string()),
+            }
+        }
+    }
+
+    struct PeopleMaker {
+        data: String,
+    }
+
+    impl PeopleMaker {
+        fn new(s: &str) -> PeopleMaker {
+            PeopleMaker{ data: s.to_string() }
+        }
+        fn make_people( &self ) -> Vec<Person> {
+            let mut people: Vec<Person> = Vec::new();
+            for comma_sep in self.data.split(";") {
+                people.push( Person::create_from_str(comma_sep) );
+            }
+            return people;
+        }
+    }
+
+    let people_maker: PeopleMaker = PeopleMaker::new("1,2;6,8;2,3;9,1;5,7;1,5");
+    let people:       Vec<Person> = people_maker.make_people();
+
+    for person in people {
+        match (person.foo, person.bar, person.baz.clone()) {
+            (Some(1), Some(_bar), Some(baz)) => {
+                if &baz == "James" {
+                    println!("{:?}",person);
+                }
+            },
+            (_,_,_) => {},
+        }
     }
 }
 
-fn basic_pattern6 () {
-    enum OptionalInt {
-        Value(i32),
-        Missing,
+fn test_number_3 () {
+    #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone)]
+    enum Color {
+        Blue,
+        Green,
     }
-    let x = OptionalInt::Value(128);
-    match x {
-        OptionalInt::Value(..) => println!("Value"),
-        OptionalInt::Missing   => println!("Missing"),
+
+    struct Person {
+        first_name: String,
+        last_name:  String,
     }
+
+    struct PersonBuilder {
+        first_name: String,
+        last_name:  String,
+    }
+
+    impl PersonBuilder {
+        fn new () -> PersonBuilder {
+            PersonBuilder {
+                first_name: "James".to_string(),
+                last_name:  "Carson".to_string(),
+            }
+        }
+        fn first_name(&mut self, s: &str) -> &mut PersonBuilder {
+            self.first_name = s.to_string();
+            self
+        }
+        fn last_name(&mut self, s: &str) -> &mut PersonBuilder {
+            self.last_name = s.to_string();
+            self
+        }
+        fn finalize (&self) -> Person {
+            Person {
+                first_name: self.first_name.clone(),
+                last_name:  self.last_name.clone(),
+            }
+        }
+    }
+
+    fn take_ownership ( person: Person ) {
+        println!("first_name: {}, last_name: {}", person.first_name, person.last_name);
+    }
+
+    fn borrows ( person: &Person ) {
+        println!("first_name: {}, last_name: {}", person.first_name, person.last_name);
+    }
+
+    // #1 Testing Ownership
+    // Won't compile since the function takes over person
+    let person: Person = Person { first_name: "Joe".to_string(), last_name: "Blow".to_string() };
+    take_ownership( person );
+    // take_ownership( person );
+    
+    // #2 Testing Borrowing
+    // Will work since it takes a reference there for only borrows person
+    let person: Person = Person { first_name: "Joe".to_string(), last_name: "Blow".to_string() };
+    borrows( &person );
+    borrows( &person );
+
+    // #3 Taking Ownership in Iterators
+    let strings: Vec<String> = vec!["A".to_string(),"B".to_string(),"C".to_string()];
+    println!("{:?}",strings);
+    for string in strings {
+        println!("string: {}",string);
+    }
+    // println!("{:?}",strings);
+
+    // #4 Borrowing in Iterators
+    let strings: Vec<String> = vec!["A".to_string(),"B".to_string(),"C".to_string()];
+    println!("{:?}",strings);
+    for string in &strings {
+        println!("string: {}",string);
+    }
+    println!("{:?}",strings);
+
+    let _: Person = PersonBuilder::new().first_name("John").last_name("Goolie").finalize();
+
+    let mut hash: HashMap<u8,u8> = HashMap::new();
+    hash.insert(1,10);
+    hash.insert(2,20);
+
+    let bash: HashMap<u8,u8> = hash.clone();
+    println!("{:?}",bash);
+
+    let mut foo: HashMap<Color,u8> = HashMap::new();
+    foo.insert(Color::Blue,0);
+    foo.insert(Color::Green,1);
+
+    let bar: HashMap<Color,u8> = foo.clone();
+    println!("{:?}",bar);
 }
 
-fn basic_pattern7 () {
-    enum OptionalInt {
-        Value(i32),
-        Missing,
+fn test_number_4 () {
+    struct SomeText<'a> {
+        str_a: &'a str,
+        str_b: &'a str,
     }
-    let x = OptionalInt::Value(45);
-    match x {
-        OptionalInt::Value(i) if i > 20 => println!("{} > 20!",i),
-        OptionalInt::Value(..)          => println!("other"),
-        OptionalInt::Missing            => println!("missing"),
-    }
-}
 
-fn pattern_test () {
-    basic_pattern(0);
-    basic_pattern(1);
-    basic_pattern(56);
-    basic_pattern2(0);
-    basic_pattern2(1);
-    basic_pattern2(35);
-    basic_pattern3(5);
-    basic_pattern3(45);
-    basic_pattern3(17);
-    basic_pattern4(3);
-    basic_pattern4(128);
-    basic_pattern5();
-    basic_pattern6();
-    basic_pattern7();
-}
-// Trait Objects  -----------------------------------------------------------------------------------
-fn trait_objects_test() {
-    trait Foo {
-        fn method(&self) -> String;
+    impl<'a> SomeText<'a> {
+        fn new (a: &'a str, b: &'a str) -> SomeText<'a> {
+            SomeText {
+                str_a: a,
+                str_b: b 
+            }
+        }
     }
-    impl Foo for u8 {
-        fn method(&self) -> String { format!("u8: {}",*self) }
-    }
-    impl Foo for String {
-        fn method(&self) -> String { format!("string: {}",*self) }
-    }
-    fn do_something<T: Foo> (x: T) {
-        x.method();
-    }
-    fn do_something2(x: &Foo) {
-        x.method();
-    }
-    let x = 5u8;
-    let y = "Hello".to_string();
-    do_something(x);
-    do_something(y);
-    do_something2(&x as &Foo);
-    do_something2(&x);
-}
-// closures  -----------------------------------------------------------------------------------
-fn closures_test() {
-    //
-    let plus_one = |x: u8| x + 1;
-    let plus_two = |x: u8| {
-        let mut result:u8 = x;
-        result+=1;
-        result+=1;
-        result
-    };
-    assert_eq!(2,plus_one(1));
-    assert_eq!(4,plus_two(2));
-    //
-    let mut num = 5;
-    let clos = |x: u8| x + num;
-    assert_eq!(8,clos(3));
-    //
-    let mut foo = 6;
+
+    let s: &str;
     {
-        let clos2 = |x: u8| x + foo;
+        let some_text: SomeText = SomeText::new("James","Carson");
+        s = some_text.str_a;
     }
-    let y = &mut foo;
-    //
-    let mut baz = 5;
-    {
-        let mut add_num = |x: u8| baz+=x;
-        add_num(2);
-    }
-    assert_eq!(baz,7);
-    //
-    let mut shiz = 10;
-    {
-        let mut add_num = move |x: u8| shiz+=x;
-        add_num(7);
-    }
-    assert_eq!(shiz,10);
-    //
-    fn call_with_two<F>(some_closure: F) -> i32 where F : Fn(i32) -> i32 {
-        some_closure(2)
-    }
-    assert_eq!(64,call_with_two(|x| x * 32));
-    //
-    fn call_with_one(some_closure: &Fn(i32) -> i32) -> i32 {
-        some_closure(1)
-    }
-    assert_eq!(5,call_with_one(&|x| x + 4));
-    //
-    fn factory() -> Box<Fn(u8) -> u8> {
-        let num = 5;
-        Box::new(move |x| x + num)
-    }
-    let f = factory();
-    assert_eq!(9,f(4));
+    println!("s: {}",s);
 }
 
-fn universal_function_call() {
-    trait Foo {
-        fn f(&self);
+fn test_number_5 () {
+    struct SomeBullShit {
+        foo: String,
+        bar: u8,
     }
-    trait Bar {
-        fn f(&self);
-    }
-    struct Baz;
-    impl Foo for Baz {
-        fn f(&self) {
-            println!("FOO");
+
+    impl SomeBullShit {
+        fn new(foo:&str, bar:u8) -> SomeBullShit {
+            SomeBullShit {
+                foo: foo.to_string(),
+                bar: bar,
+            }
         }
     }
-    impl Bar for Baz {
-        fn f(&self) {
-            println!("BAR");
+
+    impl fmt::Debug for SomeBullShit {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f,"SomeBullShit( foo: {}, bar: {} )", self.foo, self.bar)
         }
     }
-    let thing = Baz;
-    Foo::f(&thing);
-    Bar::f(&thing);
-}
 
-static N: u8 = 8;
-const MAX_THINGS: u8 = 68;
-
-fn static_and_const() {
-    println!("N: {}",N);
-    println!("MAX_THINGS: {}",MAX_THINGS);
-}
-
-fn aliases() {
-    type Name     = String;
-    let x: Name   = "Jim".to_string();
-    let y: String = "Gym".to_string();
-    println!("My name is {}",x);
-    if x == y {
-        println!("foobar");
-    }
-}
-
-fn casting() {
-    let x: u8 = 8;
-    let y = x as u16;
-    println!("x: {}",x);
-    println!("y: {}",y);
-}
-
-fn associated_types() {
-    trait Graph {
-        type N;
-        type E;
-        fn has_edge(&self,&Self::N,&Self::N) -> bool;
-        fn edges(&self, &Self::N) -> Vec<Self::E>;
-    }
-    struct Node;
-    struct Edge;
-    struct MyGraph;
-    impl Graph for MyGraph {
-        type N = Node;
-        type E = Edge;
-
-        fn has_edge(&self,n1: &Node,n2: &Node) -> bool {
-            true
-        }
-        fn edges(&self,n: &Node) -> Vec<Edge> {
-            Vec::new()
+    impl fmt::Display for SomeBullShit {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            write!(f,"{}",self.foo)
         }
     }
-    let graph = MyGraph;
-    let obj = Box::new(graph) as Box<Graph<N=Node,E=Edge>>;
-}
 
-fn overloading() {
-    use std::ops::Add;
-    struct Num {
-        val: u8,
+    let b = SomeBullShit::new("Jim",45);
+    println!("SomeBullShit Debug --- {:?}",b);
+    println!("SomeBullShit Display --- {}",b);
+
+    assert_eq!(Duration::weeks(1).cmp(&Duration::days(3)),Ordering::Greater);
+    assert_eq!(Duration::hours(1).cmp(&Duration::minutes(70)),Ordering::Less);
+    assert_eq!(Duration::seconds(1).cmp(&Duration::milliseconds(1000)),Ordering::Equal);
+    assert_eq!(Duration::microseconds(1).cmp(&Duration::nanoseconds(1)),Ordering::Greater);
+
+    let d = Duration::span(|| {
+        let big_slice   = &[1u8; 10000];
+        let mut _sum:u64 = 0;
+        for value in big_slice.iter() {
+            _sum += *value as u64;
+        }
+    });
+
+    println!("Duration: {}µs",d.num_microseconds().unwrap());
+
+    assert_eq!(Duration::hours(5).checked_add(&Duration::hours(20)).unwrap(),Duration::hours(25));
+    assert_eq!(Duration::minutes(1).checked_sub(&Duration::seconds(30)).unwrap(),Duration::seconds(30));
+    assert!(Duration::zero().is_zero());
+
+    let start_time = PreciseTime::now();
+    while start_time.to( PreciseTime::now() ) < Duration::milliseconds(1) {
+        println!("hello");
     }
-    impl Add for Num {
-        type Output = Num;
-        fn add(self, other: Num) -> Num {
-            Num{val: self.val * other.val}
+    let start_time = SteadyTime::now();
+    while SteadyTime::now() - start_time < Duration::milliseconds(1) {
+        println!("goodbye");
+    }
+    assert_eq!(Timespec::new(100,0) - Timespec::new(50,0),Duration::seconds(50));
+
+    let ts:Timespec = time::now().to_timespec();
+    println!("current epoch: {}",ts.sec);
+    println!("current local time: {}",time::at(ts).strftime("%Y-%m-%d %H:%M:%S").unwrap());
+    println!("current UTC time: {}",time::at_utc(ts).strftime("%Y-%m-%d %H:%M:%S").unwrap());
+    println!("empty time: {:?}",time::empty_tm());
+    println!("current epoch: {}",time::get_time().sec);
+    println!("current UTC time: {}",time::now_utc().strftime("%Y-%m-%d %H:%M:%S").unwrap());
+    println!("another strftime: {}",time::strftime("%Y-%m-%d %H:%M:%S",&time::now()).unwrap());
+
+    let dates:Vec<&str>        = vec!["1981-07-24","09/23/1983","04-27-1987"];
+    let date_formats:Vec<&str> = vec!["%Y-%m-%d","%m/%d/%Y","%m-%d-%Y"];
+    for date in &dates {
+        for format in &date_formats {
+            match time::strptime(date,format) {
+                Ok(time) => {
+                    println!("date({}) as rfc3339: {}",date,time.rfc3339());
+                    break;
+                }
+                Err(_) => continue,
+            }
         }
     }
-    impl Add<u8> for Num {
-        type Output = u8;
-        fn add(self, other: u8) -> u8 {
-            self.val * other
-        }
-    }
-    let x = Num{val: 2};
-    let y = Num{val: 4};
-    let z = Num{val: 10};
-    assert_eq!(8,(x+y).val);
-    assert_eq!(20,z+2);
+    println!("time since unspecified epoch: {}",time::precise_time_s());
+    println!("time since unspecified epoch as i64: {}",time::precise_time_s() as i64);
+    println!("unspecified epoch???: {}",(time::now() - Duration::seconds(time::precise_time_s() as i64)).rfc3339());
+    println!("current ctime: {}",time::now().ctime());
 }
 
-// main  -----------------------------------------------------------------------------------
-fn main () {
-    generics_test();
-    traits_test();
-    if_let_test();
-    while_let_test();
-    thread_test();
-    pattern_test();
-    trait_objects_test();
-    closures_test();
-    universal_function_call();
-    static_and_const();
-    aliases();
-    casting();
-    associated_types();
-    overloading();
+fn main() {
+    test_number_0();
+    test_number_1();
+    test_number_2();
+    test_number_3();
+    test_number_4();
+    test_number_5();
 }
+
+
