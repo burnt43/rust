@@ -30,6 +30,26 @@ impl ClosureCaller {
     }
 }
 
+struct ClosureCallerPartDeux<'a> {
+    closures: HashMap<&'a str,&'a Fn() -> ()>,
+}
+
+impl<'a> ClosureCallerPartDeux<'a> {
+    fn new () -> ClosureCallerPartDeux<'a> {
+        ClosureCallerPartDeux { closures: HashMap::new() }
+    }
+    fn register_action ( &mut self, s: &'a str, f: &'a Fn() -> () ) {
+        self.closures.insert(s,f.clone());
+    }
+    fn take_action ( &self, s: &str ) {
+        if let Some(closure) = self.closures.get(s) {
+            closure();
+        } else {
+            println!("no action for {}",s);
+        }
+    }
+}
+
 pub fn execute () {
     let times_two = |x: u8| x * 2;
     assert_eq!(4,times_two(2));
@@ -60,6 +80,8 @@ pub fn execute () {
     assert_eq!(call_a_closure(|x: u8| x + 1, 1), 2);
 
     call_a_closure_without_args(|| println!("closure"));
+    
+    println!("------------------------------");
 
     let mut caller = ClosureCaller::new();
     let vec: Vec<&str> = vec![
@@ -76,6 +98,18 @@ pub fn execute () {
     caller.register_closure("GET /home",Box::new( || {
         println!("(/home): 200 OK");
     }));
+    for request_paths in &vec {
+        caller.take_action(request_paths);
+    }
+
+    println!("------------------------------");
+
+    let a = || println!("called 'GET /'");
+    let b = || println!("called 'GET /home'");
+    let mut caller = ClosureCallerPartDeux::new();
+    caller.register_action("GET /",&a);
+    caller.register_action("GET /home",&b);
+
     for request_paths in &vec {
         caller.take_action(request_paths);
     }
