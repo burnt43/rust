@@ -11,6 +11,5 @@ fn main() {
     testing::box_tests::execute();
     testing::hash_map_tests::execute();
     testing::iter_tests::execute();
+    testing::drop_tests::execute();
 }
-
-

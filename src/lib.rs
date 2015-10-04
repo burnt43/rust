@@ -10,3 +10,4 @@ pub mod macro_tests;
 pub mod box_tests;
 pub mod hash_map_tests;
 pub mod iter_tests;
+pub mod drop_tests;
