@@ -13,4 +13,5 @@ fn main() {
     testing::iter_tests::execute();
     testing::drop_tests::execute();
     testing::if_let_tests::execute();
+    testing::closure_tests::execute();
 }

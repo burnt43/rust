@@ -12,3 +12,4 @@ pub mod hash_map_tests;
 pub mod iter_tests;
 pub mod drop_tests;
 pub mod if_let_tests;
+pub mod closure_tests;
