@@ -50,6 +50,26 @@ impl<'a> ClosureCallerPartDeux<'a> {
     }
 }
 
+struct ClosureCallerPart3 {
+    closures: HashMap< String,Box<Fn() -> ()> >,
+}
+
+impl ClosureCallerPart3 {
+    fn new () -> ClosureCallerPart3 {
+        ClosureCallerPart3 { closures: HashMap::new() }
+    }
+    fn register_action<F> ( &mut self, s: &str, f: &'static F ) where F: Fn() -> () {
+        self.closures.insert( s.to_string(),Box::new(f) );
+    }
+    fn take_action ( &self, s: &str ) {
+        if let Some(closure) = self.closures.get(s) {
+            (*closure)();
+        } else {
+            println!("no action for {}",s);
+        }
+    }
+}
+
 pub fn execute () {
     let times_two = |x: u8| x * 2;
     assert_eq!(4,times_two(2));
@@ -113,4 +133,13 @@ pub fn execute () {
     for request_paths in &vec {
         caller.take_action(request_paths);
     }
+    
+    println!("------------------------------");
+
+    //let mut caller = ClosureCallerPart3::new();
+    //caller.register_action( "GET /", &'static (|| println!("getting /")) );
+
+    //for request_path in &vec {
+    //    caller.take_action(request_path);
+    //}
 }
