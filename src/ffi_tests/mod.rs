@@ -13,4 +13,7 @@ extern {
 pub fn execute () {
     let x = unsafe { snappy_max_compressed_length(100) };
     println!("x: {}",x);
+
+    let y = unsafe { has_mouse() };
+    println!("y: {}",y);
 }
