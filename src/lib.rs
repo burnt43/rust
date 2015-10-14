@@ -1,4 +1,5 @@
 extern crate time;
+extern crate libc;
 
 pub mod time_tests;
 pub mod debug_and_fmt_tests;
@@ -15,3 +16,4 @@ pub mod if_let_tests;
 pub mod closure_tests;
 pub mod any_tests;
 pub mod fmt_tests;
+pub mod ffi_tests;

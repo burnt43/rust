@@ -16,4 +16,5 @@ fn main() {
     testing::closure_tests::execute();
     testing::any_tests::execute();
     testing::fmt_tests::execute();
+    testing::ffi_tests::execute();
 }
