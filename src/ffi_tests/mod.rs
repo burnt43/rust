@@ -27,6 +27,21 @@ extern {
     fn has_mouse () -> bool;
 }
 
+fn compress(src: &[u8]) -> Vec<u8> {
+    unsafe {
+        let src_len = src.len();
+        let p_src   = src.as_ptr();
+
+        let mut dst_len = snappy_max_compressed_length(src_len as size_t);
+        let mut dst     = Vec::with_capacity(dst_len as usize);
+
+        let p_dst = dst.as_mut_ptr();
+        snappy_compress(p_src, src_len as size_t, p_dst, &mut dst_len);
+        dst.set_len(dst_len as usize);
+        dst
+    }
+}
+
 fn validate_compressed_buffer(src: &[u8]) -> Result<bool,&str> {
     unsafe {
         match snappy_validate_compressed_buffer( src.as_ptr(), src.len() as size_t ) {
@@ -49,4 +64,9 @@ pub fn execute () {
         Ok(boolean) => println!("{}",boolean),
         Err(e)      => println!("{}",e),
     }
+
+    let buffer: &[u8] = &[65;1000];
+    let v = compress(buffer);
+    println!("{:?}",v);
+
 }
