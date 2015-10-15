@@ -17,4 +17,5 @@ fn main() {
     testing::any_tests::execute();
     testing::fmt_tests::execute();
     testing::ffi_tests::execute();
+    testing::raw_pointer_tests::execute();
 }

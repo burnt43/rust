@@ -17,3 +17,4 @@ pub mod closure_tests;
 pub mod any_tests;
 pub mod fmt_tests;
 pub mod ffi_tests;
+pub mod raw_pointer_tests;
