@@ -69,4 +69,11 @@ pub fn execute () {
     let v = compress(buffer);
     println!("{:?}",v);
 
+    let buffer: &[u8] = &v[..];
+    println!("{:?}",buffer);
+    match validate_compressed_buffer(buffer) {
+        Ok(boolean) => println!("{}",boolean),
+        Err(e)      => println!("{}",e),
+    }
+
 }
