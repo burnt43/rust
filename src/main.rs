@@ -1,6 +1,7 @@
 extern crate testing;
 
 fn main() {
+    /*
     testing::time_tests::execute();
     testing::debug_and_fmt_tests::execute();
     testing::lifetime_tests::execute();
@@ -18,4 +19,6 @@ fn main() {
     testing::fmt_tests::execute();
     testing::ffi_tests::execute();
     testing::raw_pointer_tests::execute();
+    */
+    testing::struct_mem_tests::execute();
 }
