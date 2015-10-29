@@ -5,3 +5,4 @@ authors = ["James Carson <jms.crsn@gmail.com>"]
 [dependencies]
 time = "*"
 libc = "*"
+ncurses = { git = "https://github.com/burnt43/rust-ncurses" }

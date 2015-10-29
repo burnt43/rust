@@ -1,4 +1,6 @@
 extern crate testing;
+extern crate ncurses;
+use ncurses::Window;
 
 fn main() {
     /*
@@ -21,4 +23,8 @@ fn main() {
     testing::raw_pointer_tests::execute();
     testing::struct_mem_tests::execute();
     */
+    let window: Window = ncurses::initialize_screen();
+    window.printw("Hello, World!");
+    //window.getch();
+    ncurses::end_window();
 }
