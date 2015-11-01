@@ -24,7 +24,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "ncurses"
 version = "0.1.0"
-source = "git+https://github.com/burnt43/rust-ncurses#2a277fa9b85c98ea24aadca24ecfec5957cd03f1"
+source = "git+https://github.com/burnt43/rust-ncurses#17ae3726f69be1108710d09b3a4249bfe7057f88"
 dependencies = [
  "libc 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

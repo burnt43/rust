@@ -21,4 +21,5 @@ pub mod ffi_tests;
 pub mod raw_pointer_tests;
 pub mod struct_mem_tests;
 */
-pub mod random_stuff1;
+pub mod box_tests;
+pub mod clone_tests;
