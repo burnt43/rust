@@ -1,23 +1,20 @@
 use std::fmt::Debug;
 use std::any::Any;
 
-fn log<T: Any + Debug>(value: &T) {
+fn strlen_or_debug<T: Any + Debug>(value: &T) -> String {
     let value_any = value as &Any;
 
-    if value_any.is::<String>() {
-        println!("i am a string");
-    }
     match value_any.downcast_ref::<String>() {
         Some(string) => {
-            println!("String ({}): {}", string.len(), string);
+            format!("Length: {}", string.len())
         }
         None => {
-            println!("{:?}",value);
+            format!("Debug: {:?}",value)
         }
     }
 }
 
-fn i_take_any_type(something: &mut Any) {
+fn modify_input(something: &mut Any) {
     if let Some(string) = something.downcast_mut::<String>() {
         string.push_str("hello");
     }
@@ -26,18 +23,28 @@ fn i_take_any_type(something: &mut Any) {
     }
 }
 
-pub fn execute () {
-    let some_string = "Hello".to_string();
-    log(&some_string);
+#[test]
+fn using_any_1 () {
+    let foobar:String = "foobar".to_string();
+    assert!( (&foobar as &Any).is::<String>() );
 
-    let some_integer = 19u8;
-    log(&some_integer);
+    let foobar:&str = "foobar";
+    assert!( (&foobar as &Any).is::<&str>() );
+}
 
-    let mut some_slice:[u8;3] = [1,2,3];
-    i_take_any_type(&mut some_slice);
-    assert_eq!([128,2,3],some_slice);
+#[test]
+fn using_any_2 () {
+    assert_eq!( strlen_or_debug( &("James".to_string()) ), "Length: 5" );
+    assert_eq!( strlen_or_debug(&34), "Debug: 34" );
+}
 
-    let mut some_string = "foo: ".to_string();
-    i_take_any_type(&mut some_string);
-    assert_eq!("foo: hello",some_string);
+#[test]
+fn using_any_3 () {
+    let mut foobar:String = "jello".to_string();
+    modify_input(&mut foobar);
+    assert_eq!( foobar, "jellohello" );
+
+    let mut foobar:[u8;3] = [1,2,3];
+    modify_input(&mut foobar);
+    assert_eq!( foobar, [128,2,3] );
 }
