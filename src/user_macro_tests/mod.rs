@@ -69,8 +69,9 @@ fn foobar () {
     let v: Vec<u8> = shlec![1,2,3,4];
     assert_eq!( v[0], 1 );
     assert_eq!( 30, i_want_some_trait( Foobar{x: 10, y: 20} ) );
-    assert_eq!( 4, i_want_some_trait( &[Foobar{x: 1, y:3}] as &[Foobar] ) );
+    assert_eq!( 4,  i_want_some_trait( &[Foobar{x: 1, y:3}] as &[Foobar] ) );
     assert_eq!( 10, i_want_some_trait( attributes![Foobar{x:1,y:2},Foobar{x:3,y:4}] ) );
+    assert_eq!( 50, i_want_some_trait( attributes![Foobar{x:25,y:25}] ) );
 
     let a: &[u32] = o_O!(10; [1,2]; 20; [3,4]);
     assert_eq!( a, [11,12,23,24] );
