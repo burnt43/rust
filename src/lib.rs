@@ -7,3 +7,4 @@ pub mod any_tests;
 pub mod user_macro_tests;
 pub mod bitwise_traits;
 pub mod cstring_tests;
+pub mod heterogeneous_vector_tests;
