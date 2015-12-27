@@ -64,6 +64,28 @@ fn i_want_some_trait<T: SomeTrait> (foo: T) -> u8 {
     foo.some_function()
 }
 
+macro_rules! goofy_addition {
+    ( $x:expr,$y:expr ) => { $x + $y } 
+}
+
+macro_rules! int_flags {
+    ( $x:expr;$($y:expr),* ) => {
+        for i in &[$($y),*] {
+            if $x & i > 0 {
+                println!("\033[0;32m1\033[0;39m");
+            } else {
+                println!("\033[0;31m0\033[0;39m");
+            }
+        }
+    }
+}
+
+macro_rules! str_to_u64vec {
+    ( $x:expr ) => {
+            $x.chars().map(|c| c as u64).collect::<Vec<u64>>()
+    }
+}
+
 #[test]
 fn foobar () {
     let v: Vec<u8> = shlec![1,2,3,4];
@@ -75,4 +97,12 @@ fn foobar () {
 
     let a: &[u32] = o_O!(10; [1,2]; 20; [3,4]);
     assert_eq!( a, [11,12,23,24] );
+    assert_eq!( 10, goofy_addition!(4,6) );
+
+    const CAN_READ : u64 = 4;
+    const CAN_WRITE : u64 = 2;
+    const CAN_EXEC: u64 = 1;
+    int_flags!(5;CAN_READ,CAN_WRITE,CAN_EXEC);
+    
+    assert_eq!( vec![65u64,66u64], str_to_u64vec!("AB") );
 }
