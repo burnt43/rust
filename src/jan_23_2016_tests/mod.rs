@@ -59,7 +59,7 @@ impl Foo {
 }
 
 #[test]
-fn test1() {
+fn changing_box_reference() {
     let mut f = Foo::new();
     assert_eq!(f.some_speak.get_id(),256);
     f.switch_to_dog();
@@ -69,7 +69,7 @@ fn test1() {
 }
 
 #[test]
-fn test2() {
+fn box_scopes1() {
     {
         let _foo: Foo;
         {
@@ -84,7 +84,7 @@ fn test2() {
 }
 
 #[test]
-fn test3() {
+fn box_scopes2() {
     let raw_pointer: *const u8;
     {
         let boxed_pointer: Box<u8>;
@@ -94,4 +94,46 @@ fn test3() {
     unsafe {
         assert_eq!(*raw_pointer,10u8);
     }
+}
+
+#[test]
+fn lifetimes1() {
+    fn foo1<'a> (p_data: &'a mut u8) -> () {
+        *p_data = 128;
+    }
+    let mut num: u8 = 0;
+    foo1(&mut num);
+    assert_eq!(num,128);
+}
+
+#[test]
+fn lifetimes2() {
+    struct Foo<'a> {
+        p_data: &'a u8,
+    }
+    impl<'a> Foo<'a> {
+        fn get_p_data(&self) -> &u8 {
+            self.p_data
+        }
+    }
+    // Does Not Compile (x does not live long enough)
+    /*
+    let foo: Foo;
+    {
+        let x: &u8 = &10;
+        foo = Foo { p_data: x }
+    }
+    */
+
+    // Does Not Compile (x does not live long enough)
+    /*
+    let foo: Foo;
+    let x: &u8 = &10;
+    foo = Foo { p_data: x };
+    */
+
+    // Does Compile!
+    let x: &u8 = &10;
+    let foo: Foo;
+    foo = Foo { p_data: x };
 }
