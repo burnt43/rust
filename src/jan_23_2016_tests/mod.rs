@@ -68,14 +68,30 @@ fn test1() {
     assert_eq!(f.some_speak.get_id(),256);
 }
 
+#[test]
 fn test2() {
-    let _foo: Foo;
     {
-        let _box: Box<Speak> = Box::new(Dog::new());
-        _foo = Foo {
-            some_field: 1,
-            some_speak: _box,
+        let _foo: Foo;
+        {
+            let _box: Box<Speak> = Box::new(Dog::new());
+            _foo = Foo {
+                some_field: 1,
+                some_speak: _box,
+            }
         }
+        assert_eq!(_foo.some_speak.get_id(),65536);
     }
-    assert_eq!(_foo.some_speak.get_id(),65536);
+}
+
+#[test]
+fn test3() {
+    let raw_pointer: *const u8;
+    {
+        let boxed_pointer: Box<u8>;
+        boxed_pointer = Box::new(10u8);
+        raw_pointer = Box::into_raw(boxed_pointer);
+    }
+    unsafe {
+        assert_eq!(*raw_pointer,10u8);
+    }
 }
