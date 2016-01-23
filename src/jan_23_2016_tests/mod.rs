@@ -59,11 +59,23 @@ impl Foo {
 }
 
 #[test]
-fn foo() {
+fn test1() {
     let mut f = Foo::new();
     assert_eq!(f.some_speak.get_id(),256);
     f.switch_to_dog();
     assert_eq!(f.some_speak.get_id(),65536);
     f.switch_to_cat();
     assert_eq!(f.some_speak.get_id(),256);
+}
+
+fn test2() {
+    let _foo: Foo;
+    {
+        let _box: Box<Speak> = Box::new(Dog::new());
+        _foo = Foo {
+            some_field: 1,
+            some_speak: _box,
+        }
+    }
+    assert_eq!(_foo.some_speak.get_id(),65536);
 }
