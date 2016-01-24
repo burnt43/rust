@@ -137,3 +137,11 @@ fn lifetimes2() {
     let foo: Foo;
     foo = Foo { p_data: x };
 }
+
+fn lifetimes3() {
+    fn get_box() -> Box<u8> {
+        let x: Box<u8> = Box::new(16u8);
+        x
+    }
+    assert_eq!(*get_box(), 16u8);
+}
